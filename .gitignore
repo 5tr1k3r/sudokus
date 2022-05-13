@@ -1,0 +1,7 @@
+.idea/
+.ipynb_checkpoints/
+test_sudokus/
+__pycache__
+
+test*.py
+*.toml
