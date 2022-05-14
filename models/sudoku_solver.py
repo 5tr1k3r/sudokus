@@ -102,8 +102,7 @@ class SudokuSolver:
 
     @staticmethod
     def notify_solution_invalid():
-        if cfg.solve_output_enabled:
-            print('Solution is invalid!\n')
+        print('Solution is invalid!\n')
 
     @staticmethod
     def give_breakdown(puzzle: Puzzle):
