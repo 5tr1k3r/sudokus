@@ -26,6 +26,10 @@ class SudokuSolver:
                 break
 
         self.give_breakdown()
+
+        if self.puzzle.is_solved():
+            self.puzzle.validate_solution()
+
         self.puzzle.prettyprint_grid()
 
     def give_breakdown(self):

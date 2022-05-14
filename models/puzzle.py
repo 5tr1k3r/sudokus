@@ -132,6 +132,15 @@ class Puzzle:
 
         return result
 
+    def get_all_rows(self) -> List[NumSet]:
+        return [set(self.grid[y][x] for x, y in row) for row in self.get_all_row_indices()]
+
+    def get_all_columns(self) -> List[NumSet]:
+        return [set(self.grid[y][x] for x, y in row) for row in self.get_all_column_indices()]
+
+    def get_all_boxes(self) -> List[NumSet]:
+        return [set(self.grid[y][x] for x, y in row) for row in self.get_all_box_indices()]
+
     def show_all_candidates(self):
         for y in range(self.size):
             for x in range(self.size):
@@ -144,6 +153,14 @@ class Puzzle:
     def prettyprint_grid(self):
         for row in self.grid:
             print(row)
+
+    def validate_solution(self) -> bool:
+        all_groups = self.get_all_rows() + self.get_all_columns() + self.get_all_boxes()
+        result = all(len(group) == self.size for group in all_groups)
+        if not result:
+            print('Solution is invalid!\n')
+
+        return result
 
 
 if __name__ == '__main__':
