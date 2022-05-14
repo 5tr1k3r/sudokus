@@ -1,3 +1,4 @@
+import config as cfg
 from models.puzzle import Puzzle
 from models.tech.hidden_single import HiddenSingle
 from models.tech.locked_candidates import LockedCandidates
@@ -24,7 +25,7 @@ class SudokuSolver:
                 any_progress = any_progress or success
 
             if not any_progress:
-                print('No progress detected, stopping the solve')
+                self.notify_no_progress()
                 break
 
         self.give_breakdown(puzzle)
@@ -32,24 +33,36 @@ class SudokuSolver:
         if puzzle.is_solved():
             is_validated = puzzle.validate_solution()
             if not is_validated:
-                print('Solution is invalid!\n')
+                self.notify_solution_invalid()
 
         self.display_puzzle(puzzle)
 
         return is_validated
 
     @staticmethod
+    def notify_no_progress():
+        if cfg.solve_output_enabled:
+            print('No progress detected, stopping the solve')
+
+    @staticmethod
+    def notify_solution_invalid():
+        if cfg.solve_output_enabled:
+            print('Solution is invalid!\n')
+
+    @staticmethod
     def give_breakdown(puzzle: Puzzle):
-        current_cell_count = puzzle.count_cells()
-        total_cells = puzzle.size * puzzle.size
-        print(f'\nOriginal clue count: {puzzle.original_clue_count}')
-        print(f'Cells solved: {current_cell_count - puzzle.original_clue_count}')
-        print(f'Final progress: {(current_cell_count / total_cells):.0%}\n')
+        if cfg.solve_output_enabled:
+            current_cell_count = puzzle.count_cells()
+            total_cells = puzzle.size * puzzle.size
+            print(f'\nOriginal clue count: {puzzle.original_clue_count}')
+            print(f'Cells solved: {current_cell_count - puzzle.original_clue_count}')
+            print(f'Final progress: {(current_cell_count / total_cells):.0%}\n')
 
     @staticmethod
     def display_puzzle(puzzle: Puzzle):
-        for row in puzzle.grid:
-            print(row)
+        if cfg.solve_output_enabled:
+            for row in puzzle.grid:
+                print(row)
 
 
 if __name__ == '__main__':

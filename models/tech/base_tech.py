@@ -1,15 +1,20 @@
 from collections import Counter
 
+import config as cfg
 from models.puzzle import Puzzle, IndexSet
 
 
 def check_if_solved(func):
     def wrapper(self):
         if self.puzzle.is_solved():
-            print('Puzzle is solved already')
+            if cfg.solve_output_enabled:
+                print('Puzzle is solved already')
+
             return True
 
-        print(f'Applying {self.__class__.__name__} technique')
+        if cfg.solve_output_enabled:
+            print(f'Applying {self.__class__.__name__} technique')
+
         return func(self)
 
     return wrapper
@@ -23,7 +28,9 @@ class BaseTechnique:
         pass
 
     def assign_value_to_cell(self, value: int, x: int, y: int):
-        print(f'  found {value} at position {x, y}')
+        if cfg.solve_output_enabled:
+            print(f'  found {value} at position {x, y}')
+
         self.puzzle.grid[y][x] = value
         self.remove_candidate_from_rcb(value, x, y)
         self.puzzle.candidates[y][x] = set()
@@ -48,5 +55,8 @@ class BaseTechnique:
             if candidate_value in self.puzzle.candidates[y][x]:
                 self.puzzle.candidates[y][x].discard(candidate_value)
                 count += 1
+
+        if cfg.solve_output_enabled and count > 0:
+            print(f'  removed candidate {candidate_value} from {count} cell(s)')
 
         return count
