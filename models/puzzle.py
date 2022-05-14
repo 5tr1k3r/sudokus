@@ -33,7 +33,8 @@ class Puzzle:
         return len([x for row in self.grid for x in row if x > 0])
 
     def load_from_file(self, filename: str):
-        if not (file := Path(filename)).is_file():
+        file = Path(__file__).parent.parent / 'puzzles' / filename
+        if not file.is_file():
             print(f"{file} doesn't exist")
             return
 
