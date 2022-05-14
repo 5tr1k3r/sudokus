@@ -1,5 +1,6 @@
 from models.puzzle import Puzzle
 from models.tech.hidden_single import HiddenSingle
+from models.tech.locked_candidates import LockedCandidates
 from models.tech.single_candidate import SingleCandidate
 
 
@@ -9,6 +10,7 @@ class SudokuSolver:
         self.tech = [
             SingleCandidate(self.puzzle),
             HiddenSingle(self.puzzle),
+            LockedCandidates(self.puzzle),
         ]
 
     def solve(self):

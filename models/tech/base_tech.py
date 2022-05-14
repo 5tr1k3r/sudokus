@@ -1,4 +1,6 @@
-from models.puzzle import Puzzle
+from collections import Counter
+
+from models.puzzle import Puzzle, IndexSet
 
 
 def check_if_solved(func):
@@ -25,3 +27,22 @@ class BaseTechnique:
         self.puzzle.grid[y][x] = value
         self.puzzle.remove_candidate_from_rcb(value, x, y)
         self.puzzle.candidates[y][x] = set()
+
+    def get_candidates_counter(self, group: IndexSet) -> Counter:
+        counter = Counter()
+        for x, y in group:
+            counter.update(self.puzzle.candidates[y][x])
+
+        return counter
+
+    def get_candidates_indices_by_value(self, value: int, group: IndexSet) -> IndexSet:
+        return {(x, y) for x, y in group if value in self.puzzle.candidates[y][x]}
+
+    def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> int:
+        count = 0
+        for x, y in group:
+            if candidate_value in self.puzzle.candidates[y][x]:
+                self.puzzle.candidates[y][x].discard(candidate_value)
+                count += 1
+
+        return count
