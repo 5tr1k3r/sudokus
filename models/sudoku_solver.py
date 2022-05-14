@@ -6,7 +6,7 @@ from models.tech.single_candidate import SingleCandidate
 
 class SudokuSolver:
     def __init__(self):
-        self.puzzle = Puzzle('sudoku2.txt')
+        self.puzzle = Puzzle.from_file('sudoku2.txt')
         self.tech = [
             SingleCandidate(self.puzzle),
             HiddenSingle(self.puzzle),
