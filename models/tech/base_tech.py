@@ -25,8 +25,12 @@ class BaseTechnique:
     def assign_value_to_cell(self, value: int, x: int, y: int):
         print(f'  found {value} at position {x, y}')
         self.puzzle.grid[y][x] = value
-        self.puzzle.remove_candidate_from_rcb(value, x, y)
+        self.remove_candidate_from_rcb(value, x, y)
         self.puzzle.candidates[y][x] = set()
+
+    def remove_candidate_from_rcb(self, candidate: int, x: int, y: int):
+        for i, j in self.puzzle.get_rcb_indices(x, y):
+            self.puzzle.candidates[j][i].discard(candidate)
 
     def get_candidates_counter(self, group: IndexSet) -> Counter:
         counter = Counter()

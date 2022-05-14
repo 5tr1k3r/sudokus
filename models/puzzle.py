@@ -24,7 +24,7 @@ class Puzzle:
             raise ValueError(f'Invalid puzzle: unsupported puzzle size ({size})')
 
         self.size = size
-        self.box_size = self.find_box_size()
+        self.box_size = self.supported_sizes[size]
         if grid is None:
             self.grid: List[List[int]] = [[0 for _ in range(self.size)] for _ in range(self.size)]
         else:
@@ -103,9 +103,6 @@ class Puzzle:
 
         return cls(size, grid)
 
-    def find_box_size(self) -> int:
-        return self.supported_sizes[self.size]
-
     def count_cells(self) -> int:
         return len([x for row in self.grid for x in row if x > 0])
 
@@ -116,6 +113,7 @@ class Puzzle:
         return ''.join(str(x) for row in self.grid for x in row)
 
     def copy_puzzle_string(self):
+        # this should get moved to the future Game class
         pyperclip.copy(self.get_puzzle_string())
         print('Copied the puzzle string')
 
@@ -166,10 +164,6 @@ class Puzzle:
     def get_candidates_for_cell(self, x: int, y: int) -> NumSet:
         return set(range(1, self.size + 1)) - self.get_rcb(x, y)
 
-    def remove_candidate_from_rcb(self, candidate: int, x: int, y: int):
-        for i, j in self.get_rcb_indices(x, y):
-            self.candidates[j][i].discard(candidate)
-
     def get_all_row_indices(self) -> List[IndexSet]:
         return [self.get_row_indices(0, y) for y in range(self.size)]
 
@@ -193,26 +187,9 @@ class Puzzle:
     def get_all_boxes(self) -> List[NumSet]:
         return [set(self.grid[y][x] for x, y in row) for row in self.get_all_box_indices()]
 
-    def show_all_candidates(self):
-        for y in range(self.size):
-            for x in range(self.size):
-                num = self.grid[y][x]
-                if num == 0:
-                    a = sorted(self.get_candidates_for_cell(x, y))
-                    print(x, y, a, end=' | ')
-            print()
-
-    def prettyprint_grid(self):
-        for row in self.grid:
-            print(row)
-
     def validate_solution(self) -> bool:
         all_groups = self.get_all_rows() + self.get_all_columns() + self.get_all_boxes()
-        result = all(len(group) == self.size for group in all_groups)
-        if not result:
-            print('Solution is invalid!\n')
-
-        return result
+        return all(len(group) == self.size for group in all_groups)
 
 
 if __name__ == '__main__':

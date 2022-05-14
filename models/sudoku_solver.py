@@ -28,9 +28,11 @@ class SudokuSolver:
         self.give_breakdown()
 
         if self.puzzle.is_solved():
-            self.puzzle.validate_solution()
+            is_validated = self.puzzle.validate_solution()
+            if not is_validated:
+                print('Solution is invalid!\n')
 
-        self.puzzle.prettyprint_grid()
+        self.display_puzzle()
 
     def give_breakdown(self):
         current_cell_count = self.puzzle.count_cells()
@@ -38,6 +40,10 @@ class SudokuSolver:
         print(f'\nOriginal clue count: {self.puzzle.original_clue_count}')
         print(f'Cells solved: {current_cell_count - self.puzzle.original_clue_count}')
         print(f'Final progress: {(current_cell_count / total_cells):.0%}\n')
+
+    def display_puzzle(self):
+        for row in self.puzzle.grid:
+            print(row)
 
 
 if __name__ == '__main__':
