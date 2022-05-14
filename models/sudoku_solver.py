@@ -1,3 +1,5 @@
+import time
+
 import config as cfg
 from models.puzzle import Puzzle
 from models.tech.hidden_single import HiddenSingle
@@ -6,6 +8,8 @@ from models.tech.single_candidate import SingleCandidate
 
 
 class SudokuSolver:
+    batches_path = cfg.root / 'puzzles/batches'
+
     def __init__(self):
         self.tech = [
             SingleCandidate,
@@ -39,6 +43,58 @@ class SudokuSolver:
 
         return is_validated
 
+    def batch_solve(self, filename: str,
+                    save_results: bool = False,
+                    results_filename: str = None,
+                    save_unsolved: bool = False):
+        if results_filename is None:
+            results_filename = 'results.txt'
+
+        with open(self.batches_path / filename) as f:
+            all_puzzles = f.read().splitlines()
+
+        cfg.solve_output_enabled = False
+        total_count = len(all_puzzles)
+        unsolved = []
+        time_start = time.perf_counter()
+
+        for puzzle_string in all_puzzles:
+            puzzle = Puzzle.from_string(puzzle_string)
+            if not self.solve(puzzle):
+                puzzle_state = puzzle.get_puzzle_string()
+                unsolved.append(puzzle_state)
+
+        time_taken = time.perf_counter() - time_start
+
+        tech_names = ', '.join([x.__name__ for x in self.tech])
+        output = [f'{filename} | using {tech_names}', f'Total sudokus: {total_count}']
+        if unsolved:
+            unsolved_rate = len(unsolved) / total_count
+            output.append(f"Unsolved sudokus: {len(unsolved)} ({unsolved_rate:.2%})")
+            if save_unsolved:
+                with open(self.batches_path / f'unsolved_{filename}', 'w') as f:
+                    f.write('\n'.join(unsolved))
+
+        time_per_sudoku = time_taken / total_count
+        output.append(f'Finished in {time_taken:.2f}s, {time_per_sudoku:.4f}s per sudoku\n\n')
+        output_string = '\n'.join(output)
+
+        print(output_string)
+        if save_results:
+            with open(self.batches_path / results_filename, 'a') as f:
+                f.write(output_string)
+
+    def batch_solve_everything(self, results_filename: str, save_unsolved=False):
+        results_file = self.batches_path / results_filename
+        if results_file.is_file():
+            print(f'{results_filename} already exists')
+            return
+
+        files = ('0.txt', '1.txt', '2.txt', '3.txt', '5.txt', 'ez1k.txt', 'mid2500.txt')
+        for file in files:
+            self.batch_solve(file, save_results=True, results_filename=results_filename,
+                             save_unsolved=save_unsolved)
+
     @staticmethod
     def notify_no_progress():
         if cfg.solve_output_enabled:
@@ -67,5 +123,9 @@ class SudokuSolver:
 
 if __name__ == '__main__':
     solver = SudokuSolver()
-    p = Puzzle.from_file('sudoku.txt')
-    solver.solve(p)
+    # p = Puzzle.from_file('sudoku.txt')
+    # p = Puzzle.from_string('708000309309180200000700008270600001000200803800010000005006000100307650037000002')
+    # solver.solve(p)
+
+    # solver.batch_solve_everything('results.txt')
+    solver.batch_solve('ez1k.txt')
