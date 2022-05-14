@@ -1,4 +1,5 @@
 from collections import Counter
+from string import ascii_uppercase
 
 import config as cfg
 from models.puzzle import Puzzle, IndexSet
@@ -20,6 +21,10 @@ def check_if_solved(func):
     return wrapper
 
 
+def convert_index(x: int, y: int) -> str:
+    return ascii_uppercase[y] + str(x + 1)
+
+
 class BaseTechnique:
     def __init__(self, puzzle: Puzzle):
         self.puzzle = puzzle
@@ -29,7 +34,7 @@ class BaseTechnique:
 
     def assign_value_to_cell(self, value: int, x: int, y: int):
         if cfg.solve_output_enabled:
-            print(f'  found {value} at position {x, y}')
+            print(f'  found {value} at position {convert_index(x, y)}')
 
         self.puzzle.grid[y][x] = value
         self.remove_candidate_from_rcb(value, x, y)
