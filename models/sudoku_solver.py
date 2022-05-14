@@ -3,7 +3,7 @@ import time
 import config as cfg
 from models.puzzle import Puzzle
 from models.tech.hidden_single import HiddenSingle
-from models.tech.locked_candidates import LockedCandidates
+from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.single_candidate import SingleCandidate
 
 
@@ -14,7 +14,7 @@ class SudokuSolver:
         self.tech = [
             SingleCandidate,
             HiddenSingle,
-            LockedCandidates,
+            LockedCandidatesOnLine,
         ]
 
     def solve(self, puzzle: Puzzle) -> bool:

@@ -1,7 +1,7 @@
 from models.tech.base_tech import BaseTechnique, check_if_solved
 
 
-class LockedCandidates(BaseTechnique):
+class LockedCandidatesOnLine(BaseTechnique):
     @check_if_solved
     def apply(self) -> bool:
         is_progress = False
@@ -30,6 +30,7 @@ class LockedCandidates(BaseTechnique):
                 if line_is_formed:
                     # noinspection PyUnboundLocalVariable
                     removed_count = self.remove_candidate_from_group(value, target_cells)
-                    is_progress = removed_count > 0
+                    if removed_count > 0:
+                        is_progress = True
 
         return is_progress
