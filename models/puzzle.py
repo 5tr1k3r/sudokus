@@ -131,6 +131,9 @@ class Puzzle:
 
         return candidates
 
+    def get_box_base_index(self, x: int, y: int) -> Tuple[int, int]:
+        return x - x % self.box_size, y - y % self.box_size
+
     def get_row_indices(self, _x: int, y: int) -> IndexSet:
         return set(((x, y) for x in range(self.size)))
 
@@ -138,11 +141,8 @@ class Puzzle:
         return set(((x, y) for y in range(self.size)))
 
     def get_box_indices(self, x: int, y: int) -> IndexSet:
-        bs = self.box_size
-        box_x = x // bs * bs
-        box_y = y // bs * bs
-
-        return set(((x, y) for y in range(box_y, box_y + bs) for x in range(box_x, box_x + bs)))
+        box_x, box_y = self.get_box_base_index(x, y)
+        return set(((x, y) for y in range(box_y, box_y + self.box_size) for x in range(box_x, box_x + self.box_size)))
 
     def get_rcb_indices(self, x: int, y: int) -> IndexSet:
         # Get a combined set of indices from row, column and box
