@@ -14,10 +14,7 @@ class SingleCandidate(BaseTechnique):
             for x in range(self.puzzle.size):
                 if len(cands := self.puzzle.candidates[y][x]) == 1:
                     found_value = cands.pop()
-                    print(f'{found_value=} at position {x, y}')
-
-                    self.puzzle.grid[y][x] = found_value
-                    self.puzzle.remove_candidate_from_rcb(found_value, x, y)
+                    self.assign_value_to_cell(found_value, x, y)
                     is_progress = True
 
         return is_progress

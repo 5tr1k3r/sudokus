@@ -24,9 +24,13 @@ class Puzzle:
             self.load_from_file(filename)
 
         self.candidates: List[List[NumSet]] = self.get_all_candidates()
+        self.original_clue_count = self.count_cells()
 
     def find_box_size(self) -> int:
         return self.supported_sizes[self.size]
+
+    def count_cells(self) -> int:
+        return len([x for row in self.grid for x in row if x > 0])
 
     def load_from_file(self, filename: str):
         if not (file := Path(filename)).is_file():
@@ -112,6 +116,20 @@ class Puzzle:
     def remove_candidate_from_rcb(self, candidate: int, x: int, y: int):
         for i, j in self.get_rcb_indices(x, y):
             self.candidates[j][i].discard(candidate)
+
+    def get_all_row_indices(self) -> List[IndexSet]:
+        return [self.get_row_indices(0, y) for y in range(self.size)]
+
+    def get_all_column_indices(self) -> List[IndexSet]:
+        return [self.get_column_indices(x, 0) for x in range(self.size)]
+
+    def get_all_box_indices(self) -> List[IndexSet]:
+        result = []
+        for y in range(0, self.size, self.box_size):
+            for x in range(0, self.size, self.box_size):
+                result.append(self.get_box_indices(x, y))
+
+        return result
 
     def show_all_candidates(self):
         for y in range(self.size):
