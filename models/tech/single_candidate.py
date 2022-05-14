@@ -1,14 +1,9 @@
-from models.tech.base_tech import BaseTechnique
+from models.tech.base_tech import BaseTechnique, check_if_solved
 
 
 class SingleCandidate(BaseTechnique):
+    @check_if_solved
     def apply(self) -> bool:
-        if self.puzzle.is_solved():
-            print('Puzzle is solved already')
-            return True
-
-        print(f'Applying {self.__class__.__name__} technique')
-
         is_progress = False
         for y in range(self.puzzle.size):
             for x in range(self.puzzle.size):

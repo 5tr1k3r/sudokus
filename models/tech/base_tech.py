@@ -1,6 +1,18 @@
 from models.puzzle import Puzzle
 
 
+def check_if_solved(func):
+    def wrapper(self):
+        if self.puzzle.is_solved():
+            print('Puzzle is solved already')
+            return True
+
+        print(f'Applying {self.__class__.__name__} technique')
+        return func(self)
+
+    return wrapper
+
+
 class BaseTechnique:
     def __init__(self, puzzle: Puzzle):
         self.puzzle = puzzle
