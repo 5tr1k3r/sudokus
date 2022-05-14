@@ -4,6 +4,7 @@ import config as cfg
 from models.puzzle import Puzzle
 from models.tech.hidden_single import HiddenSingle
 from models.tech.locked_candidates import LockedCandidatesOnLine
+from models.tech.locked_candidates_in_box import LockedCandidatesInBox
 from models.tech.single_candidate import SingleCandidate
 
 
@@ -15,6 +16,7 @@ class SudokuSolver:
             SingleCandidate,
             HiddenSingle,
             LockedCandidatesOnLine,
+            LockedCandidatesInBox,
         ]
 
     def solve(self, puzzle: Puzzle) -> bool:
@@ -38,6 +40,8 @@ class SudokuSolver:
             is_validated = puzzle.validate_solution()
             if not is_validated:
                 self.notify_solution_invalid()
+        # else:
+        #     puzzle.copy_puzzle_string()
 
         self.display_puzzle(puzzle)
 
