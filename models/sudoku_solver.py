@@ -39,7 +39,7 @@ class SudokuSolver:
             if puzzle.check_if_solved():
                 break
 
-            lp_progress = self.apply_tech_group(low_priority_tech)
+            lp_progress = self.apply_tech_group_once(low_priority_tech)
             any_progress = any_progress or lp_progress
             if not any_progress:
                 self.notify_no_progress()
@@ -70,6 +70,16 @@ class SudokuSolver:
 
             if not iteration_progress:
                 return total_progress
+
+    @staticmethod
+    def apply_tech_group_once(group: List[Technique]) -> bool:
+        total_progress = False
+
+        for tech in group:
+            tech_progress = tech.apply()
+            total_progress = total_progress or tech_progress
+
+        return total_progress
 
     def batch_solve(self, filename: str,
                     save_results: bool = False,
