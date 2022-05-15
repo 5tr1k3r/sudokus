@@ -7,11 +7,11 @@ from models.puzzle import Puzzle, IndexSet
 
 def check_if_solved(func):
     def wrapper(self):
-        if self.puzzle.is_solved():
+        if self.puzzle.check_if_solved():
             if cfg.solve_output_enabled:
                 print('Puzzle is solved already')
 
-            return True
+            return False
 
         if cfg.solve_output_enabled:
             print(f'Applying {self.__class__.__name__} technique')

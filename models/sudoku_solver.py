@@ -23,7 +23,7 @@ class SudokuSolver:
         tech_instances = [tech(puzzle) for tech in self.tech]
         is_validated = False
 
-        while not puzzle.is_solved():
+        while not puzzle.check_if_solved():
             any_progress = False
 
             for tech in tech_instances:
@@ -36,7 +36,7 @@ class SudokuSolver:
 
         self.give_breakdown(puzzle)
 
-        if puzzle.is_solved():
+        if puzzle.check_if_solved():
             is_validated = puzzle.validate_solution()
             if not is_validated:
                 self.notify_solution_invalid()
