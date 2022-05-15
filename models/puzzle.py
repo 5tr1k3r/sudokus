@@ -184,6 +184,9 @@ class Puzzle:
 
         return result
 
+    def get_all_group_indices(self) -> List[IndexSet]:
+        return self.get_all_row_indices() + self.get_all_column_indices() + self.get_all_box_indices()
+
     def get_all_rows(self) -> List[NumSet]:
         return [set(self.grid[y][x] for x, y in row) for row in self.get_all_row_indices()]
 
