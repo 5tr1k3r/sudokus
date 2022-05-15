@@ -1,35 +1,46 @@
 import time
+from typing import List, TypeVar
 
 import config as cfg
 from models.puzzle import Puzzle
+from models.tech.base_tech import BaseTechnique
 from models.tech.hidden_single import HiddenSingle
 from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.locked_candidates_in_box import LockedCandidatesInBox
 from models.tech.single_candidate import SingleCandidate
+
+Technique = TypeVar('Technique', bound=BaseTechnique)
 
 
 class SudokuSolver:
     batches_path = cfg.root / 'puzzles/batches'
 
     def __init__(self):
-        self.tech = [
+        self.tech = (
             SingleCandidate,
             HiddenSingle,
             LockedCandidatesOnLine,
             LockedCandidatesInBox,
-        ]
+        )
+        self.high_priority_tech = (
+            SingleCandidate,
+            HiddenSingle,
+        )
 
     def solve(self, puzzle: Puzzle) -> bool:
-        tech_instances = [tech(puzzle) for tech in self.tech]
+        high_priority_tech = [tech(puzzle) for tech in self.tech if tech in self.high_priority_tech]
+        low_priority_tech = [tech(puzzle) for tech in self.tech if tech not in self.high_priority_tech]
         is_validated = False
 
         while not puzzle.check_if_solved():
             any_progress = False
 
-            for tech in tech_instances:
-                success = tech.apply()
-                any_progress = any_progress or success
+            self.apply_tech_group(high_priority_tech)
+            if puzzle.check_if_solved():
+                break
 
+            lp_progress = self.apply_tech_group(low_priority_tech)
+            any_progress = any_progress or lp_progress
             if not any_progress:
                 self.notify_no_progress()
                 break
@@ -40,12 +51,25 @@ class SudokuSolver:
             is_validated = puzzle.validate_solution()
             if not is_validated:
                 self.notify_solution_invalid()
-        # else:
-        #     puzzle.copy_puzzle_string()
 
         self.display_puzzle(puzzle)
 
         return is_validated
+
+    @staticmethod
+    def apply_tech_group(group: List[Technique]) -> bool:
+        total_progress = False
+        while True:
+            iteration_progress = False
+
+            for tech in group:
+                tech_progress = tech.apply()
+                iteration_progress = iteration_progress or tech_progress
+
+            total_progress = total_progress or iteration_progress
+
+            if not iteration_progress:
+                return total_progress
 
     def batch_solve(self, filename: str,
                     save_results: bool = False,
