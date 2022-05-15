@@ -2,7 +2,7 @@ from collections import Counter
 from string import ascii_uppercase
 
 import config as cfg
-from models.puzzle import Puzzle, IndexSet
+from models.puzzle import Puzzle, IndexSet, NumSet
 
 
 def check_if_solved(func):
@@ -53,6 +53,9 @@ class BaseTechnique:
 
     def get_candidates_indices_by_value(self, value: int, group: IndexSet) -> IndexSet:
         return {(x, y) for x, y in group if value in self.puzzle.candidates[y][x]}
+
+    def get_candidates_indices_by_exact_candidates(self, cands: NumSet, group: IndexSet) -> IndexSet:
+        return {(x, y) for x, y in group if cands == self.puzzle.candidates[y][x]}
 
     def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> int:
         count = 0
