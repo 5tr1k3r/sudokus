@@ -7,6 +7,7 @@ from models.tech.base_tech import BaseTechnique
 from models.tech.hidden_single import HiddenSingle
 from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.locked_candidates_in_box import LockedCandidatesInBox
+from models.tech.naked_subset import NakedSubset
 from models.tech.single_candidate import SingleCandidate
 
 Technique = TypeVar('Technique', bound=BaseTechnique)
@@ -21,6 +22,7 @@ class SudokuSolver:
             HiddenSingle,
             LockedCandidatesOnLine,
             LockedCandidatesInBox,
+            NakedSubset,
         )
         self.high_priority_tech = (
             SingleCandidate,
