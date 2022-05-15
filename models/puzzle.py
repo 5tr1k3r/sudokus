@@ -32,7 +32,7 @@ class Puzzle:
 
         self.candidates: List[List[NumSet]] = self.get_all_candidates()
         self.original_clue_count = self.count_cells()
-        self.is_solved = False
+        self._is_solved = False
 
     @classmethod
     def from_file(cls, filename: str) -> Optional['Puzzle']:
@@ -108,12 +108,12 @@ class Puzzle:
         return len([x for row in self.grid for x in row if x > 0])
 
     def check_if_solved(self) -> bool:
-        if not self.is_solved:
+        if not self._is_solved:
             status = all(x for row in self.grid for x in row)
-            self.is_solved = status
+            self._is_solved = status
             return status
 
-        return self.is_solved
+        return self._is_solved
 
     def get_puzzle_string(self) -> str:
         return ''.join(str(x) for row in self.grid for x in row)
