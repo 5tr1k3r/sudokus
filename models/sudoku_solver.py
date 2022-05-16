@@ -137,7 +137,8 @@ class SudokuSolver:
 
     def construct_result_string(self, filename: str, total_count: int,
                                 unsolved_count: int, time_taken: float) -> str:
-        output = [f'{filename}']
+        hp_line = ', '.join(tech.__name__ for tech in self.high_priority_tech)
+        output = [f'{filename} | High priority tech: {hp_line}']
         unsolved_rate = unsolved_count / total_count
         time_per_sudoku = time_taken / total_count
         output.append(f'Total: {total_count}, unsolved: {unsolved_count} ({unsolved_rate:.1%}), '
@@ -148,8 +149,13 @@ class SudokuSolver:
                 avg_line = f' ({round(avg_time_per_tech_use)}μs per)'
             else:
                 avg_line = ''
-            output.append(f'{tech.__name__}: {tech.successful_uses} uses, '
+            output.append(f'{tech.__name__}: {tech.successful_uses}/{tech.total_uses} uses, '
                           f'took {tech.total_time:.2f}s{avg_line}')
+
+        total_uses = sum(tech.total_uses for tech in self.tech)
+        total_time = sum(tech.total_time for tech in self.tech)
+        avg_time = total_time / total_uses * 10 ** 6
+        output.append(f'TOTAL USES: {total_uses}, {round(avg_time)}μs per')
 
         return '\n'.join(output) + '\n\n'
 
