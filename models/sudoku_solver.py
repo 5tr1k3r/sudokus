@@ -31,10 +31,16 @@ class SudokuSolver:
             SingleCandidate,
             HiddenSingle,
         )
+        self.low_priority_tech = (
+            LockedCandidatesInBox,
+            HiddenSubset,
+        )
 
     def solve(self, puzzle: Puzzle) -> bool:
         high_priority_tech = [tech(puzzle) for tech in self.tech if tech in self.high_priority_tech]
-        low_priority_tech = [tech(puzzle) for tech in self.tech if tech not in self.high_priority_tech]
+        normal_priority_tech = [tech(puzzle) for tech in self.tech if tech not in self.high_priority_tech
+                                and tech not in self.low_priority_tech]
+        low_priority_tech = [tech(puzzle) for tech in self.tech if tech in self.low_priority_tech]
         is_validated = False
 
         while not puzzle.check_if_solved():
@@ -44,11 +50,12 @@ class SudokuSolver:
             if puzzle.check_if_solved():
                 break
 
-            lp_progress = self.apply_tech_group_once(low_priority_tech)
+            lp_progress = self.apply_tech_group_once(normal_priority_tech)
             any_progress = any_progress or lp_progress
             if not any_progress:
-                self.notify_no_progress()
-                break
+                if not self.apply_tech_group_once(low_priority_tech):
+                    self.notify_no_progress()
+                    break
 
         self.give_breakdown(puzzle)
 
