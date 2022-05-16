@@ -117,8 +117,16 @@ class SudokuSolver:
         output.append(f'Total: {total_count}, unsolved: {len(unsolved)} ({unsolved_rate:.1%}), '
                       f'took {time_taken:.2f}s ({time_per_sudoku:.4f}s per)')
         for tech in self.tech:
-            output.append(f'{tech.__name__}: {tech.uses} uses')
-            tech.uses = 0
+            if tech.total_uses > 0:
+                avg_time_per_tech_use = tech.total_time / tech.total_uses
+                avg_line = f' ({avg_time_per_tech_use:.6f}s per)'
+            else:
+                avg_line = ''
+            output.append(f'{tech.__name__}: {tech.successful_uses} uses, '
+                          f'took {tech.total_time:.2f}s{avg_line}')
+            tech.total_uses = 0
+            tech.successful_uses = 0
+            tech.total_time = 0.0
 
         output_string = '\n'.join(output) + '\n\n'
 

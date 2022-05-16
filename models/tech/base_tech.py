@@ -1,3 +1,4 @@
+import time
 from collections import Counter
 from string import ascii_uppercase
 
@@ -6,7 +7,7 @@ from models.puzzle import Puzzle, IndexSet, NumSet
 
 
 def check_if_solved(func):
-    def wrapper(self):
+    def wrapper(self: BaseTechnique):
         if self.puzzle.check_if_solved():
             if cfg.solve_output_enabled:
                 print('Puzzle is solved already')
@@ -16,9 +17,13 @@ def check_if_solved(func):
         if cfg.solve_output_enabled:
             print(f'Applying {self.__class__.__name__} technique')
 
+        time_start = time.perf_counter()
         is_used = func(self)
+
+        self.__class__.total_uses += 1
         if is_used:
-            self.__class__.uses += 1
+            self.__class__.successful_uses += 1
+        self.__class__.total_time += time.perf_counter() - time_start
 
         return is_used
 
@@ -30,7 +35,9 @@ def convert_index(x: int, y: int) -> str:
 
 
 class BaseTechnique:
-    uses = 0
+    total_uses = 0
+    successful_uses = 0
+    total_time = 0.0
 
     def __init__(self, puzzle: Puzzle):
         self.puzzle = puzzle
