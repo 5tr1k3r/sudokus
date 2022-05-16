@@ -51,11 +51,7 @@ class BaseTechnique:
             self.puzzle.candidates[j][i].discard(candidate)
 
     def get_candidates_counter(self, group: IndexSet) -> Counter:
-        counter = Counter()
-        for x, y in group:
-            counter.update(self.puzzle.candidates[y][x])
-
-        return counter
+        return Counter(cand_value for x, y in group for cand_value in self.puzzle.candidates[y][x])
 
     def get_candidates_indices_by_value(self, value: int, group: IndexSet) -> IndexSet:
         return {(x, y) for x, y in group if value in self.puzzle.candidates[y][x]}
