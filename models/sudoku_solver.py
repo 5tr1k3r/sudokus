@@ -106,18 +106,21 @@ class SudokuSolver:
 
         time_taken = time.perf_counter() - time_start
 
-        tech_names = ', '.join([x.__name__ for x in self.tech])
-        output = [f'{filename} | using {tech_names}', f'Total sudokus: {total_count}']
-        if unsolved:
-            unsolved_rate = len(unsolved) / total_count
-            output.append(f"Unsolved sudokus: {len(unsolved)} ({unsolved_rate:.2%})")
-            if save_unsolved:
-                with open(self.batches_path / f'unsolved_{filename}', 'w') as f:
-                    f.write('\n'.join(unsolved))
+        output = [f'{filename}']
+        unsolved_rate = len(unsolved) / total_count
+        if save_unsolved:
+            with open(self.batches_path / f'unsolved_{filename}', 'w') as f:
+                f.write('\n'.join(unsolved))
 
         time_per_sudoku = time_taken / total_count
-        output.append(f'Finished in {time_taken:.2f}s, {time_per_sudoku:.4f}s per sudoku\n\n')
-        output_string = '\n'.join(output)
+
+        output.append(f'Total: {total_count}, unsolved: {len(unsolved)} ({unsolved_rate:.1%}), '
+                      f'took {time_taken:.2f}s ({time_per_sudoku:.4f}s per)')
+        for tech in self.tech:
+            output.append(f'{tech.__name__}: {tech.uses} uses')
+            tech.uses = 0
+
+        output_string = '\n'.join(output) + '\n\n'
 
         print(output_string)
         if save_results:
@@ -130,7 +133,7 @@ class SudokuSolver:
             print(f'{results_filename} already exists')
             return
 
-        files = ('0.txt', '1.txt', '2.txt', '3.txt', '5.txt', 'ez1k.txt', 'mid2500.txt')
+        files = ('0.txt', '1.txt', '2.txt', '3.txt', '5.txt')
         for file in files:
             self.batch_solve(file, save_results=True, results_filename=results_filename,
                              save_unsolved=save_unsolved)
