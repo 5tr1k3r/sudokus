@@ -1,6 +1,6 @@
 from collections import Counter
 
-from models.tech.base_tech import BaseTechnique, check_if_solved, convert_index
+from models.tech.base_tech import BaseTechnique, check_if_solved
 
 
 class NakedSubset(BaseTechnique):
