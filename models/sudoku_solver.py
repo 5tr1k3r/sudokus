@@ -94,7 +94,6 @@ class SudokuSolver:
             all_puzzles = f.read().splitlines()
 
         cfg.solve_output_enabled = False
-        total_count = len(all_puzzles)
         unsolved = []
         time_start = time.perf_counter()
 
@@ -106,34 +105,18 @@ class SudokuSolver:
 
         time_taken = time.perf_counter() - time_start
 
-        output = [f'{filename}']
-        unsolved_rate = len(unsolved) / total_count
         if save_unsolved:
             with open(self.batches_path / f'unsolved_{filename}', 'w') as f:
                 f.write('\n'.join(unsolved))
 
-        time_per_sudoku = time_taken / total_count
-
-        output.append(f'Total: {total_count}, unsolved: {len(unsolved)} ({unsolved_rate:.1%}), '
-                      f'took {time_taken:.2f}s ({time_per_sudoku:.4f}s per)')
-        for tech in self.tech:
-            if tech.total_uses > 0:
-                avg_time_per_tech_use = tech.total_time / tech.total_uses
-                avg_line = f' ({avg_time_per_tech_use:.6f}s per)'
-            else:
-                avg_line = ''
-            output.append(f'{tech.__name__}: {tech.successful_uses} uses, '
-                          f'took {tech.total_time:.2f}s{avg_line}')
-            tech.total_uses = 0
-            tech.successful_uses = 0
-            tech.total_time = 0.0
-
-        output_string = '\n'.join(output) + '\n\n'
-
+        output_string = self.construct_result_string(filename, len(all_puzzles),
+                                                     len(unsolved), time_taken)
         print(output_string)
         if save_results:
             with open(self.batches_path / results_filename, 'a') as f:
                 f.write(output_string)
+
+        self.reset_tech_stats()
 
     def batch_solve_everything(self, results_filename: str, save_unsolved=False):
         results_file = self.batches_path / results_filename
@@ -145,6 +128,30 @@ class SudokuSolver:
         for file in files:
             self.batch_solve(file, save_results=True, results_filename=results_filename,
                              save_unsolved=save_unsolved)
+
+    def reset_tech_stats(self):
+        for tech in self.tech:
+            tech.total_uses = 0
+            tech.successful_uses = 0
+            tech.total_time = 0.0
+
+    def construct_result_string(self, filename: str, total_count: int,
+                                unsolved_count: int, time_taken: float) -> str:
+        output = [f'{filename}']
+        unsolved_rate = unsolved_count / total_count
+        time_per_sudoku = time_taken / total_count
+        output.append(f'Total: {total_count}, unsolved: {unsolved_count} ({unsolved_rate:.1%}), '
+                      f'took {time_taken:.2f}s ({time_per_sudoku:.4f}s per)')
+        for tech in self.tech:
+            if tech.total_uses > 0:
+                avg_time_per_tech_use = tech.total_time / tech.total_uses
+                avg_line = f' ({avg_time_per_tech_use:.6f}s per)'
+            else:
+                avg_line = ''
+            output.append(f'{tech.__name__}: {tech.successful_uses} uses, '
+                          f'took {tech.total_time:.2f}s{avg_line}')
+
+        return '\n'.join(output) + '\n\n'
 
     @staticmethod
     def notify_no_progress():
