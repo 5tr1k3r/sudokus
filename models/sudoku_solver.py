@@ -1,3 +1,4 @@
+import random
 import time
 from typing import List, TypeVar
 
@@ -53,6 +54,8 @@ class SudokuSolver:
             is_validated = puzzle.validate_solution()
             if not is_validated:
                 self.notify_solution_invalid()
+        else:
+            self.show_puzzle_string(puzzle)
 
         self.display_puzzle(puzzle)
 
@@ -129,6 +132,15 @@ class SudokuSolver:
             self.batch_solve(file, save_results=True, results_filename=results_filename,
                              save_unsolved=save_unsolved)
 
+    def solve_random_from_batch(self, batch_filename: str):
+        with open(self.batches_path / batch_filename) as f:
+            all_puzzles = f.read().splitlines()
+
+        puzzle_string = random.choice(all_puzzles)
+        puzzle = Puzzle.from_string(puzzle_string)
+        print(f'Solving {puzzle_string}\n')
+        self.solve(puzzle)
+
     def reset_tech_stats(self):
         for tech in self.tech:
             tech.total_uses = 0
@@ -182,6 +194,13 @@ class SudokuSolver:
         if cfg.solve_output_enabled:
             for row in puzzle.grid:
                 print(row)
+
+    @staticmethod
+    def show_puzzle_string(puzzle: Puzzle):
+        if cfg.solve_output_enabled:
+            print('Final puzzle state:')
+            print(puzzle.get_puzzle_string())
+            print()
 
 
 if __name__ == '__main__':
