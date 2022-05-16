@@ -58,13 +58,13 @@ class BaseTechnique:
         return {(x, y) for x, y in group if cands == self.puzzle.candidates[y][x]}
 
     def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> int:
-        count = 0
+        cells = []
         for x, y in group:
             if candidate_value in self.puzzle.candidates[y][x]:
                 self.puzzle.candidates[y][x].discard(candidate_value)
-                count += 1
+                cells.append((x, y))
 
-        if cfg.solve_output_enabled and count > 0:
-            print(f'  removed candidate {candidate_value} from {count} cell(s)')
+        if (cell_count := len(cells)) > 0 and cfg.solve_output_enabled:
+            print(f"  removed candidate {candidate_value} from {', '.join(convert_index(x, y) for x, y in cells)}")
 
-        return count
+        return cell_count
