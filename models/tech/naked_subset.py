@@ -8,13 +8,11 @@ class NakedSubset(BaseTechnique):
     def apply(self) -> bool:
         is_progress = False
         for group in self.puzzle.get_all_group_indices():
-            counter = Counter()
             cands_list = [cands for x, y in group if (cands := self.puzzle.candidates[y][x])]
             if len(cands_list) <= 2:
                 continue
 
-            counter.update([frozenset(cands) for cands in cands_list])
-
+            counter = Counter([frozenset(cands) for cands in cands_list])
             for cands, count in counter.items():
                 if count > 1 and count == len(cands) and count != len(cands_list):
                     cands_cells = self.get_candidates_indices_by_exact_candidates(cands, group)
