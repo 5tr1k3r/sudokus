@@ -116,7 +116,7 @@ class SudokuSolver:
                                                      len(unsolved), time_taken)
         print(output_string)
         if save_results:
-            with open(self.batches_path / results_filename, 'a') as f:
+            with open(self.batches_path / results_filename, 'a', encoding='utf-8') as f:
                 f.write(output_string)
 
         self.reset_tech_stats()
