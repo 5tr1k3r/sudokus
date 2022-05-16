@@ -16,7 +16,11 @@ def check_if_solved(func):
         if cfg.solve_output_enabled:
             print(f'Applying {self.__class__.__name__} technique')
 
-        return func(self)
+        is_used = func(self)
+        if is_used:
+            self.__class__.uses += 1
+
+        return is_used
 
     return wrapper
 
@@ -26,6 +30,8 @@ def convert_index(x: int, y: int) -> str:
 
 
 class BaseTechnique:
+    uses = 0
+
     def __init__(self, puzzle: Puzzle):
         self.puzzle = puzzle
 
