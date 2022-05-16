@@ -23,8 +23,8 @@ class SudokuSolver:
             SingleCandidate,
             HiddenSingle,
             LockedCandidatesOnLine,
-            LockedCandidatesInBox,
             NakedSubset,
+            LockedCandidatesInBox,
             HiddenSubset,
         )
         self.high_priority_tech = (
