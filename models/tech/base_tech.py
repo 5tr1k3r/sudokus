@@ -20,10 +20,10 @@ def check_if_solved(func):
         time_start = time.perf_counter()
         is_used = func(self)
 
+        self.__class__.total_time += time.perf_counter() - time_start
         self.__class__.total_uses += 1
         if is_used:
             self.__class__.successful_uses += 1
-        self.__class__.total_time += time.perf_counter() - time_start
 
         return is_used
 
