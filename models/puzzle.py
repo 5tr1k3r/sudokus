@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional, List, Dict, Set, Tuple
 
@@ -137,19 +138,24 @@ class Puzzle:
 
         return candidates
 
+    @lru_cache
     def get_box_base_index(self, x: int, y: int) -> Tuple[int, int]:
         return x - x % self.box_size, y - y % self.box_size
 
+    @lru_cache
     def get_row_indices(self, _x: int, y: int) -> IndexSet:
         return set(((x, y) for x in range(self.size)))
 
+    @lru_cache
     def get_column_indices(self, x: int, _y: int) -> IndexSet:
         return set(((x, y) for y in range(self.size)))
 
+    @lru_cache
     def get_box_indices(self, x: int, y: int) -> IndexSet:
         box_x, box_y = self.get_box_base_index(x, y)
         return set(((x, y) for y in range(box_y, box_y + self.box_size) for x in range(box_x, box_x + self.box_size)))
 
+    @lru_cache
     def get_rcb_indices(self, x: int, y: int) -> IndexSet:
         # Get a combined set of indices from row, column and box
         return self.get_row_indices(x, y) | self.get_column_indices(x, y) | self.get_box_indices(x, y)
@@ -170,12 +176,15 @@ class Puzzle:
     def get_candidates_for_cell(self, x: int, y: int) -> NumSet:
         return set(range(1, self.size + 1)) - self.get_rcb(x, y)
 
+    @lru_cache
     def get_all_row_indices(self) -> List[IndexSet]:
         return [self.get_row_indices(0, y) for y in range(self.size)]
 
+    @lru_cache
     def get_all_column_indices(self) -> List[IndexSet]:
         return [self.get_column_indices(x, 0) for x in range(self.size)]
 
+    @lru_cache
     def get_all_box_indices(self) -> List[IndexSet]:
         result = []
         for y in range(0, self.size, self.box_size):
@@ -184,6 +193,7 @@ class Puzzle:
 
         return result
 
+    @lru_cache
     def get_all_group_indices(self) -> List[IndexSet]:
         return self.get_all_row_indices() + self.get_all_column_indices() + self.get_all_box_indices()
 
