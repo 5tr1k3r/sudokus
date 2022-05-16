@@ -6,6 +6,7 @@ import config as cfg
 from models.puzzle import Puzzle
 from models.tech.base_tech import BaseTechnique
 from models.tech.hidden_single import HiddenSingle
+from models.tech.hidden_subset import HiddenSubset
 from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.locked_candidates_in_box import LockedCandidatesInBox
 from models.tech.naked_subset import NakedSubset
@@ -24,6 +25,7 @@ class SudokuSolver:
             LockedCandidatesOnLine,
             LockedCandidatesInBox,
             NakedSubset,
+            HiddenSubset,
         )
         self.high_priority_tech = (
             SingleCandidate,
