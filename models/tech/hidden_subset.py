@@ -12,11 +12,11 @@ class HiddenSubset(BaseTechnique):
             if len(cands_list) <= 2:
                 continue
 
+            all_cand_values = {cand_value for cands in cands_list for cand_value in cands}
             for cand_count in range(2, 5):  # should not be 5 here but atm dunno how else.
                 if len(cands_list) <= cand_count:
                     continue
 
-                all_cand_values = {cand_value for cands in cands_list for cand_value in cands}
                 for combo in combinations(cands_list, cand_count):
                     combo_values = {n for s in combo for n in s}
                     the_rest = [x for x in cands_list]
