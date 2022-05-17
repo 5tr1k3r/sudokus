@@ -83,6 +83,7 @@ class Puzzle:
         else:
             self.grid = grid
 
+        self.all_possible_values = set(range(1, self.size + 1))
         self.candidates: List[List[NumSet]] = self.get_all_candidates()
         self.original_clue_count = self.count_cells()
         self._is_solved = False
@@ -220,7 +221,7 @@ class Puzzle:
         return set(self.grid[j][i] for i, j in self.get_rcb_indices(x, y))
 
     def get_candidates_for_cell(self, x: int, y: int) -> NumSet:
-        return set(range(1, self.size + 1)) - self.get_rcb(x, y)
+        return self.all_possible_values - self.get_rcb(x, y)
 
     def get_all_row_indices(self) -> List[IndexSet]:
         return get_all_row_indices(self.size)
