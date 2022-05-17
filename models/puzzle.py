@@ -8,6 +8,58 @@ NumSet = Set[int]
 IndexSet = Set[Tuple[int, int]]
 
 
+@lru_cache
+def get_box_base_index(box_size: int, x: int, y: int) -> Tuple[int, int]:
+    return x - x % box_size, y - y % box_size
+
+
+@lru_cache
+def get_row_indices(size: int, y: int) -> IndexSet:
+    return set(((x, y) for x in range(size)))
+
+
+@lru_cache
+def get_column_indices(size, x: int) -> IndexSet:
+    return set(((x, y) for y in range(size)))
+
+
+@lru_cache
+def get_box_indices(box_size: int, x: int, y: int) -> IndexSet:
+    box_x, box_y = get_box_base_index(box_size, x, y)
+    return set(((x, y) for y in range(box_y, box_y + box_size) for x in range(box_x, box_x + box_size)))
+
+
+@lru_cache
+def get_rcb_indices(size: int, box_size: int, x: int, y: int) -> IndexSet:
+    # Get a combined set of indices from row, column and box
+    return get_row_indices(size, y) | get_column_indices(size, x) | get_box_indices(box_size, x, y)
+
+
+@lru_cache
+def get_all_row_indices(size: int) -> List[IndexSet]:
+    return [get_row_indices(size, y) for y in range(size)]
+
+
+@lru_cache
+def get_all_column_indices(size: int) -> List[IndexSet]:
+    return [get_column_indices(size, x) for x in range(size)]
+
+
+@lru_cache
+def get_all_box_indices(size: int, box_size: int) -> List[IndexSet]:
+    result = []
+    for y in range(0, size, box_size):
+        for x in range(0, size, box_size):
+            result.append(get_box_indices(box_size, x, y))
+
+    return result
+
+
+@lru_cache
+def get_all_group_indices(size: int, box_size: int) -> List[IndexSet]:
+    return get_all_row_indices(size) + get_all_column_indices(size) + get_all_box_indices(size, box_size)
+
+
 class Puzzle:
     supported_sizes: Dict[int, int] = {4: 2, 9: 3, 16: 4}
 
@@ -138,27 +190,21 @@ class Puzzle:
 
         return candidates
 
-    @lru_cache
     def get_box_base_index(self, x: int, y: int) -> Tuple[int, int]:
-        return x - x % self.box_size, y - y % self.box_size
+        return get_box_base_index(self.box_size, x, y)
 
-    @lru_cache
     def get_row_indices(self, _x: int, y: int) -> IndexSet:
-        return set(((x, y) for x in range(self.size)))
+        return get_row_indices(self.size, y)
 
-    @lru_cache
     def get_column_indices(self, x: int, _y: int) -> IndexSet:
-        return set(((x, y) for y in range(self.size)))
+        return get_column_indices(self.size, x)
 
-    @lru_cache
     def get_box_indices(self, x: int, y: int) -> IndexSet:
-        box_x, box_y = self.get_box_base_index(x, y)
-        return set(((x, y) for y in range(box_y, box_y + self.box_size) for x in range(box_x, box_x + self.box_size)))
+        return get_box_indices(self.box_size, x, y)
 
-    @lru_cache
     def get_rcb_indices(self, x: int, y: int) -> IndexSet:
         # Get a combined set of indices from row, column and box
-        return self.get_row_indices(x, y) | self.get_column_indices(x, y) | self.get_box_indices(x, y)
+        return get_rcb_indices(self.size, self.box_size, x, y)
 
     def get_row(self, x: int, y: int) -> NumSet:
         return set(self.grid[j][i] for i, j in self.get_row_indices(x, y))
@@ -176,26 +222,17 @@ class Puzzle:
     def get_candidates_for_cell(self, x: int, y: int) -> NumSet:
         return set(range(1, self.size + 1)) - self.get_rcb(x, y)
 
-    @lru_cache
     def get_all_row_indices(self) -> List[IndexSet]:
-        return [self.get_row_indices(0, y) for y in range(self.size)]
+        return get_all_row_indices(self.size)
 
-    @lru_cache
     def get_all_column_indices(self) -> List[IndexSet]:
-        return [self.get_column_indices(x, 0) for x in range(self.size)]
+        return get_all_column_indices(self.size)
 
-    @lru_cache
     def get_all_box_indices(self) -> List[IndexSet]:
-        result = []
-        for y in range(0, self.size, self.box_size):
-            for x in range(0, self.size, self.box_size):
-                result.append(self.get_box_indices(x, y))
+        return get_all_box_indices(self.size, self.box_size)
 
-        return result
-
-    @lru_cache
     def get_all_group_indices(self) -> List[IndexSet]:
-        return self.get_all_row_indices() + self.get_all_column_indices() + self.get_all_box_indices()
+        return get_all_group_indices(self.size, self.box_size)
 
     def get_all_rows(self) -> List[NumSet]:
         return [set(self.grid[y][x] for x, y in row) for row in self.get_all_row_indices()]
