@@ -23,11 +23,11 @@ class SudokuSolver:
         self.tech = (
             SingleCandidate,
             HiddenSingle,
-            LockedCandidatesOnLine,
             NakedSubset,
+            LockedCandidatesOnLine,
             LockedCandidatesInBox,
-            HiddenSubset,
             XWing,
+            HiddenSubset,
         )
         self.high_priority_tech = (
             SingleCandidate,
