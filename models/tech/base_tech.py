@@ -66,14 +66,16 @@ class BaseTechnique:
     def get_candidates_indices_by_exact_candidates(self, cands: NumSet, group: IndexSet) -> IndexSet:
         return {(x, y) for x, y in group if cands == self.puzzle.candidates[y][x]}
 
-    def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> int:
+    def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> bool:
         cells = []
         for x, y in group:
             if candidate_value in self.puzzle.candidates[y][x]:
                 self.puzzle.candidates[y][x].discard(candidate_value)
                 cells.append((x, y))
 
-        if (cell_count := len(cells)) > 0 and cfg.solve_output_enabled:
-            print(f"  removed candidate {candidate_value} from {', '.join(convert_index(x, y) for x, y in cells)}")
+        if len(cells) > 0:
+            if cfg.solve_output_enabled:
+                print(f"  removed candidate {candidate_value} from {', '.join(convert_index(x, y) for x, y in cells)}")
+            return True
 
-        return cell_count
+        return False

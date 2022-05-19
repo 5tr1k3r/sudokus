@@ -21,8 +21,7 @@ class LockedCandidatesInBox(BaseTechnique):
 
                 x, y = indices.pop()
                 target_cells = self.puzzle.get_box_indices(x, y) - group
-                removed_count = self.remove_candidate_from_group(value, target_cells)
-                if removed_count > 0:
+                if self.remove_candidate_from_group(value, target_cells):
                     is_progress = True
 
         return is_progress

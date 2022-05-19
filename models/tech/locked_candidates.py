@@ -29,8 +29,7 @@ class LockedCandidatesOnLine(BaseTechnique):
 
                 if line_is_formed:
                     # noinspection PyUnboundLocalVariable
-                    removed_count = self.remove_candidate_from_group(value, target_cells)
-                    if removed_count > 0:
+                    if self.remove_candidate_from_group(value, target_cells):
                         is_progress = True
 
         return is_progress

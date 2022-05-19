@@ -33,8 +33,7 @@ class HiddenSubset(BaseTechnique):
                         target_cells = {cells for x in target_values
                                         for cells in self.get_candidates_indices_by_value(x, group)}
                         for value in values_to_remove:
-                            removed_count = self.remove_candidate_from_group(value, target_cells)
-                            if removed_count > 0:
+                            if self.remove_candidate_from_group(value, target_cells):
                                 is_progress = True
 
         return is_progress

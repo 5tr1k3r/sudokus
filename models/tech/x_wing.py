@@ -43,8 +43,7 @@ class XWing(BaseTechnique):
                 if self.is_rectangle(*cells):
                     target_cells = ((secondary_group_func(s, *cells[0]) |
                                     secondary_group_func(s, *cells[3])) - set(cells))
-                    removed_count = self.remove_candidate_from_group(value, target_cells)
-                    if removed_count > 0:
+                    if self.remove_candidate_from_group(value, target_cells):
                         progress = True
 
         return progress
