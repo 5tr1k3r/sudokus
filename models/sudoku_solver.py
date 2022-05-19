@@ -182,7 +182,9 @@ class SudokuSolver:
                 avg_line = f' ({round(avg_time_per_tech_use)}μs per)'
             else:
                 avg_line = ''
-            output.append(f'{tech.__name__}: {tech.successful_uses}/{tech.total_uses} uses, '
+
+            use_rate = tech.successful_uses / tech.total_uses
+            output.append(f'{tech.__name__}: {tech.successful_uses}/{tech.total_uses} uses ({use_rate:.0%}), '
                           f'took {tech.total_time:.2f}s{avg_line}')
 
         total_uses = sum(tech.total_uses for tech in self.tech)
