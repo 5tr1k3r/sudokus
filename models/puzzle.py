@@ -24,6 +24,16 @@ def get_column_indices(size, x: int) -> IndexSet:
 
 
 @lru_cache
+def get_row_indices_by_xy(size: int, _x: int, y: int) -> IndexSet:
+    return set(((x, y) for x in range(size)))
+
+
+@lru_cache
+def get_column_indices_by_xy(size, x: int, _y: int) -> IndexSet:
+    return set(((x, y) for y in range(size)))
+
+
+@lru_cache
 def get_box_indices(box_size: int, x: int, y: int) -> IndexSet:
     box_x, box_y = get_box_base_index(box_size, x, y)
     return set(((x, y) for y in range(box_y, box_y + box_size) for x in range(box_x, box_x + box_size)))
