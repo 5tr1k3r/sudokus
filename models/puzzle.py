@@ -248,8 +248,48 @@ class Puzzle:
         all_groups = self.get_all_rows() + self.get_all_columns() + self.get_all_boxes()
         return all(len(group) == self.size for group in all_groups)
 
+    def fancy_display(self) -> str:
+        # todo make it work for 4x4 and figure out what to do with 16x16
+        big_digits = (
+            ('  |', '  |'),
+            ('|_', ' _|', ' _'),
+            (' _|', ' _|', ' _'),
+            ('  |', '|_|'),
+            (' _|', '|_', ' _'),
+            ('|_|', '|_', ' _'),
+            ('  |', '  |', ' _'),
+            ('|_|', '|_|', ' _'),
+            (' _|', '|_|', ' _'),
+        )
+        n = 22
+        vgrid = [f"{' ' * n}|{' ' * (n + 1)}|{' ' * n}" for _ in range(35)]
+        hor_separator = f"{'-' * n}+{'-' * (n + 1)}+{'-' * n}"
+        vgrid[11] = hor_separator
+        vgrid[23] = hor_separator
+
+        def insert_lines(grid, x, y, lines):
+            for k, piece in enumerate(lines):
+                line = grid[y - k]
+                new_line = line[:x] + piece + line[x + len(piece):]
+                grid[y - k] = new_line
+
+            return grid
+
+        for j, row in enumerate(self.candidates):
+            for i, cands in enumerate(row):
+                pos_x = 1 + i * 8
+                pos_y = 2 + j * 4
+                if not cands:
+                    value = big_digits[self.grid[j][i] - 1]
+                    insert_lines(vgrid, pos_x, pos_y, value)
+                else:
+                    digitline = ''.join(x if int(x) in cands else ' ' for x in '789456123')
+                    digitlines = [digitline[:3], digitline[3:6], digitline[6:]]
+                    insert_lines(vgrid, pos_x, pos_y, digitlines)
+
+        return '\n'.join(line for line in vgrid)
+
 
 if __name__ == '__main__':
-    puzzle = Puzzle.from_file('sudoku2.txt')
-    print(puzzle.candidates)
-    puzzle.copy_puzzle_string()
+    puzzle = Puzzle.from_file('sudoku.txt')
+    print(puzzle.fancy_display())
