@@ -101,7 +101,7 @@ class SudokuSolver:
     def batch_solve(self, filename: str,
                     save_results: bool = False,
                     results_filename: str = None,
-                    save_unsolved: bool = False):
+                    save_unsolved: bool = False) -> float:
         if results_filename is None:
             results_filename = 'results.txt'
 
@@ -133,6 +133,8 @@ class SudokuSolver:
 
         self.reset_tech_stats()
 
+        return time_taken
+
     def batch_solve_everything(self, results_filename: str, save_unsolved=False):
         results_file = self.batches_path / results_filename
         if results_file.is_file():
@@ -140,9 +142,16 @@ class SudokuSolver:
             return
 
         files = ('0.txt', '1.txt', '2.txt', '3.txt', '5.txt')
+        total_time_taken = 0
         for file in files:
-            self.batch_solve(file, save_results=True, results_filename=results_filename,
-                             save_unsolved=save_unsolved)
+            time_taken = self.batch_solve(file, save_results=True, results_filename=results_filename,
+                                          save_unsolved=save_unsolved)
+            total_time_taken += time_taken
+
+        with open(self.batches_path / results_filename, 'a', encoding='utf-8') as f:
+            total_time_line = f'Total time taken: {total_time_taken:.2f}s'
+            print(total_time_line)
+            f.write(total_time_line)
 
     def solve_random_from_batch(self, batch_filename: str):
         with open(self.batches_path / batch_filename) as f:
