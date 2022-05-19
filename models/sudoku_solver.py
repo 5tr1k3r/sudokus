@@ -11,6 +11,7 @@ from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.locked_candidates_in_box import LockedCandidatesInBox
 from models.tech.naked_subset import NakedSubset
 from models.tech.single_candidate import SingleCandidate
+from models.tech.x_wing import XWing
 
 Technique = TypeVar('Technique', bound=BaseTechnique)
 
@@ -26,6 +27,7 @@ class SudokuSolver:
             NakedSubset,
             LockedCandidatesInBox,
             HiddenSubset,
+            XWing,
         )
         self.high_priority_tech = (
             SingleCandidate,
@@ -33,6 +35,7 @@ class SudokuSolver:
         )
         self.low_priority_tech = (
             LockedCandidatesInBox,
+            XWing,
             HiddenSubset,
         )
 
