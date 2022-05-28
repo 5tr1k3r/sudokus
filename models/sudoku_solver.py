@@ -3,11 +3,11 @@ import time
 from typing import List, TypeVar
 
 import config as cfg
-from models.puzzle import Puzzle
+from models.puzzle import Puzzle, convert_index
 from models.tech.base_tech import BaseTechnique
 from models.tech.hidden_single import HiddenSingle
 from models.tech.hidden_subset import HiddenSubset
-from models.tech.locked_candidates import LockedCandidatesOnLine
+# from models.tech.locked_candidates import LockedCandidatesOnLine
 from models.tech.locked_candidates_in_box import LockedCandidatesInBox
 from models.tech.naked_subset import NakedSubset
 from models.tech.single_candidate import SingleCandidate
@@ -24,10 +24,10 @@ class SudokuSolver:
             SingleCandidate,
             HiddenSingle,
             NakedSubset,
-            LockedCandidatesOnLine,
-            LockedCandidatesInBox,
-            XWing,
-            HiddenSubset,
+            # LockedCandidatesOnLine,
+            # LockedCandidatesInBox,
+            # XWing,
+            # HiddenSubset,
         )
         self.high_priority_tech = (
             SingleCandidate,
@@ -39,7 +39,38 @@ class SudokuSolver:
             HiddenSubset,
         )
 
-    def solve(self, puzzle: Puzzle) -> bool:
+        self.bruteforce_counter = 0
+
+    def solve(self, original_puzzle: Puzzle) -> bool:
+        queue: List[Puzzle] = [original_puzzle]
+
+        while queue:
+            puzzle = queue.pop()
+            if self.solve_logically(puzzle):
+                if cfg.solve_output_enabled:
+                    print("Puzzle solved\n")
+                return True
+
+            if puzzle.is_impossible():
+                if cfg.solve_output_enabled:
+                    print(f'Puzzle is impossible to solve!')
+                    # print(puzzle.fancy_display())
+                continue
+
+            self.bruteforce_counter += 1
+
+            x, y = puzzle.find_cell_with_fewest_candidates()
+            if cfg.solve_output_enabled:
+                print(f'Going to pick cell {convert_index(x, y)} and bruteforce from there')
+
+            for cand in puzzle.candidates[y][x]:
+                new_puzzle = puzzle.copy()
+                new_puzzle.assign_value_to_cell(cand, x, y)
+                queue.append(new_puzzle)
+
+        return False
+
+    def solve_logically(self, puzzle: Puzzle) -> bool:
         high_priority_tech = [tech(puzzle) for tech in self.tech if tech in self.high_priority_tech]
         normal_priority_tech = [tech(puzzle) for tech in self.tech if tech not in self.high_priority_tech
                                 and tech not in self.low_priority_tech]
@@ -104,6 +135,8 @@ class SudokuSolver:
                     save_unsolved: bool = False) -> float:
         if results_filename is None:
             results_filename = 'results.txt'
+
+        self.bruteforce_counter = 0
 
         with open(self.batches_path / filename) as f:
             all_puzzles = f.read().splitlines()
@@ -186,6 +219,8 @@ class SudokuSolver:
             use_rate = tech.successful_uses / tech.total_uses
             output.append(f'{tech.__name__}: {tech.successful_uses}/{tech.total_uses} uses ({use_rate:.0%}), '
                           f'took {tech.total_time:.2f}s{avg_line}')
+
+        output.append(f'Used bruteforce {self.bruteforce_counter} times')
 
         total_uses = sum(tech.total_uses for tech in self.tech)
         total_time = sum(tech.total_time for tech in self.tech)
