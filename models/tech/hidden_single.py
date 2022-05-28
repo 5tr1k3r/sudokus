@@ -10,7 +10,7 @@ class HiddenSingle(BaseTechnique):
             for value, count in counter.items():
                 if count == 1:
                     for x, y in self.get_candidates_indices_by_value(value, group):
-                        self.assign_value_to_cell(value, x, y)
+                        self.puzzle.assign_value_to_cell(value, x, y)
                         is_progress = True
 
         return is_progress

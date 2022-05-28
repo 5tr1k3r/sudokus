@@ -1,11 +1,18 @@
 from functools import lru_cache
 from pathlib import Path
+from string import ascii_uppercase
 from typing import Optional, List, Dict, Set, Tuple
 
 import pyperclip
 
+import config as cfg
+
 NumSet = Set[int]
 IndexSet = Set[Tuple[int, int]]
+
+
+def convert_index(x: int, y: int) -> str:
+    return ascii_uppercase[y] + str(x + 1)
 
 
 @lru_cache
@@ -298,6 +305,18 @@ class Puzzle:
                     insert_lines(vgrid, pos_x, pos_y, digitlines)
 
         return '\n'.join(line for line in vgrid)
+
+    def assign_value_to_cell(self, value: int, x: int, y: int):
+        if cfg.solve_output_enabled:
+            print(f'  found {value} at position {convert_index(x, y)}')
+
+        self.grid[y][x] = value
+        self.remove_candidate_from_rcb(value, x, y)
+        self.candidates[y][x] = set()
+
+    def remove_candidate_from_rcb(self, candidate: int, x: int, y: int):
+        for i, j in self.get_rcb_indices(x, y):
+            self.candidates[j][i].discard(candidate)
 
 
 if __name__ == '__main__':
