@@ -80,7 +80,9 @@ def get_all_group_indices(size: int, box_size: int) -> List[IndexSet]:
 class Puzzle:
     supported_sizes: Dict[int, int] = {4: 2, 9: 3, 16: 4}
 
-    def __init__(self, size: int = 9, grid: List[List[int]] = None):
+    def __init__(self, size: int = 9,
+                 grid: List[List[int]] = None,
+                 candidates: List[List[NumSet]] = None):
         """Represents a sudoku puzzle.
 
         Grids that are supported: 9x9, 4x4 and 16x16.
@@ -89,19 +91,25 @@ class Puzzle:
 
         :param size: width and height as a single number (4, 9 or 16)
         :param grid: a grid object to be used, optional
+        :param candidates: candidates to be supplied, optional
         """
         if size not in self.supported_sizes:
             raise ValueError(f'Invalid puzzle: unsupported puzzle size ({size})')
 
         self.size = size
         self.box_size = self.supported_sizes[size]
+        self.all_possible_values = set(range(1, self.size + 1))
+
         if grid is None:
             self.grid: List[List[int]] = [[0 for _ in range(self.size)] for _ in range(self.size)]
         else:
             self.grid = grid
 
-        self.all_possible_values = set(range(1, self.size + 1))
-        self.candidates: List[List[NumSet]] = self.get_all_candidates()
+        if candidates is None:
+            self.candidates: List[List[NumSet]] = self.get_all_candidates()
+        else:
+            self.candidates = candidates
+
         self.original_clue_count = self.count_cells()
         self._is_solved = False
 
