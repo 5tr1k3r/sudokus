@@ -175,6 +175,11 @@ class Puzzle:
 
         return cls(size, grid)
 
+    def copy(self) -> 'Puzzle':
+        return Puzzle(self.size,
+                      [[x for x in row] for row in self.grid],
+                      [[set(x) for x in row] for row in self.candidates])
+
     def count_cells(self) -> int:
         return len([x for row in self.grid for x in row if x > 0])
 
@@ -317,6 +322,29 @@ class Puzzle:
     def remove_candidate_from_rcb(self, candidate: int, x: int, y: int):
         for i, j in self.get_rcb_indices(x, y):
             self.candidates[j][i].discard(candidate)
+
+    def find_cell_with_fewest_candidates(self) -> Tuple[int, int]:
+        min_cands = self.size
+        min_x = 0
+        min_y = 0
+
+        for y, row in enumerate(self.candidates):
+            for x, cands in enumerate(row):
+                length = len(cands)
+                if length != 0:
+                    if length == 2:
+                        return x, y
+
+                    if length < min_cands:
+                        min_cands = length
+                        min_x = x
+                        min_y = y
+
+        return min_x, min_y
+
+    def is_impossible(self) -> bool:
+        return any(self.grid[y][x] == 0 and len(self.candidates[y][x]) == 0
+                   for y in range(self.size) for x in range(self.size))
 
 
 if __name__ == '__main__':
