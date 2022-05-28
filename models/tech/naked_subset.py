@@ -4,6 +4,8 @@ from models.tech.base_tech import BaseTechnique, check_if_solved
 
 
 class NakedSubset(BaseTechnique):
+    # todo this only works properly for subset of length 2
+    # https://www.learn-sudoku.com/naked-triplets.html
     @check_if_solved
     def apply(self) -> bool:
         is_progress = False
