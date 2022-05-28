@@ -302,8 +302,9 @@ class Puzzle:
                 pos_x = 1 + i * 8
                 pos_y = 2 + j * 4
                 if not cands:
-                    value = big_digits[self.grid[j][i] - 1]
-                    insert_lines(vgrid, pos_x, pos_y, value)
+                    if self.grid[j][i] != 0:
+                        value = big_digits[self.grid[j][i] - 1]
+                        insert_lines(vgrid, pos_x, pos_y, value)
                 else:
                     digitline = ''.join(x if int(x) in cands else ' ' for x in '789456123')
                     digitlines = [digitline[:3], digitline[3:6], digitline[6:]]
