@@ -1,14 +1,15 @@
 from itertools import combinations
 
-from models.tech.base_tech import BaseTechnique, check_if_solved
+from models.puzzle import Puzzle
+from models.tech.base_tech import BaseTechnique, check_if_solved_and_update_stats
 
 
 class HiddenSubset(BaseTechnique):
-    @check_if_solved
-    def apply(self) -> bool:
+    @check_if_solved_and_update_stats
+    def apply(self, puzzle: Puzzle) -> bool:
         is_progress = False
-        for group in self.puzzle.get_all_group_indices():
-            cands_list = [cands for x, y in group if (cands := self.puzzle.candidates[y][x])]
+        for group in puzzle.get_all_group_indices():
+            cands_list = [cands for x, y in group if (cands := puzzle.candidates[y][x])]
             if len(cands_list) <= 2:
                 continue
 
@@ -31,9 +32,9 @@ class HiddenSubset(BaseTechnique):
 
                         # print(f"  Hidden {('Pair', 'Triple', 'Quad')[cand_count - 2]} spotted!")
                         target_cells = {cells for x in target_values
-                                        for cells in self.get_candidates_indices_by_value(x, group)}
+                                        for cells in puzzle.get_candidates_indices_by_value(x, group)}
                         for value in values_to_remove:
-                            if self.remove_candidate_from_group(value, target_cells):
+                            if puzzle.remove_candidate_from_group(value, target_cells):
                                 is_progress = True
 
         return is_progress

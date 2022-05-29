@@ -1,3 +1,4 @@
+from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 from string import ascii_uppercase
@@ -354,6 +355,29 @@ class Puzzle:
     def is_impossible(self) -> bool:
         return any(self.grid[y][x] == 0 and len(self.candidates[y][x]) == 0
                    for y in range(self.size) for x in range(self.size))
+
+    def get_candidates_counter(self, group: IndexSet) -> Counter:
+        return Counter(cand_value for x, y in group for cand_value in self.candidates[y][x])
+
+    def get_candidates_indices_by_value(self, value: int, group: IndexSet) -> IndexSet:
+        return {(x, y) for x, y in group if value in self.candidates[y][x]}
+
+    def get_candidates_indices_by_exact_candidates(self, cands: NumSet, group: IndexSet) -> IndexSet:
+        return {(x, y) for x, y in group if cands == self.candidates[y][x]}
+
+    def remove_candidate_from_group(self, candidate_value: int, group: IndexSet) -> bool:
+        cells = []
+        for x, y in group:
+            if candidate_value in self.candidates[y][x]:
+                self.candidates[y][x].discard(candidate_value)
+                cells.append((x, y))
+
+        if len(cells) > 0:
+            if cfg.solve_output_enabled:
+                print(f"  removed candidate {candidate_value} from {', '.join(convert_index(x, y) for x, y in cells)}")
+            return True
+
+        return False
 
 
 if __name__ == '__main__':

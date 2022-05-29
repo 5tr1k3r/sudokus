@@ -2,30 +2,33 @@ from collections import defaultdict
 from itertools import combinations
 from typing import Callable, Tuple
 
+from models.puzzle import Puzzle
 from models.puzzle import (get_all_row_indices, get_all_column_indices,
                            get_row_indices, get_column_indices,
                            get_row_indices_by_xy, get_column_indices_by_xy)
-from models.tech.base_tech import BaseTechnique, check_if_solved
+from models.tech.base_tech import BaseTechnique, check_if_solved_and_update_stats
 
 Index = Tuple[int, int]
 
 
 class XWing(BaseTechnique):
-    @check_if_solved
-    def apply(self) -> bool:
-        row_progress = self.find_xwing_in_groups(get_all_row_indices, get_row_indices, get_column_indices_by_xy)
-        col_progress = self.find_xwing_in_groups(get_all_column_indices, get_column_indices, get_row_indices_by_xy,)
+    @check_if_solved_and_update_stats
+    def apply(self, puzzle: Puzzle) -> bool:
+        row_progress = self.find_xwing_in_groups(puzzle, get_all_row_indices,
+                                                 get_row_indices, get_column_indices_by_xy)
+        col_progress = self.find_xwing_in_groups(puzzle, get_all_column_indices,
+                                                 get_column_indices, get_row_indices_by_xy,)
 
         return row_progress or col_progress
 
-    def find_xwing_in_groups(self, get_all_groups_func: Callable,
+    def find_xwing_in_groups(self, puzzle: Puzzle, get_all_groups_func: Callable,
                              main_group_func: Callable,
                              secondary_group_func: Callable) -> bool:
         progress = False
-        s = self.puzzle.size
+        s = puzzle.size
         values_and_groups = defaultdict(set)
         for i, group in enumerate(get_all_groups_func(s)):
-            counter = self.get_candidates_counter(group)
+            counter = puzzle.get_candidates_counter(group)
             for value in {value for value, count in counter.items() if count == 2}:
                 values_and_groups[i].add(value)
 
@@ -36,14 +39,14 @@ class XWing(BaseTechnique):
 
             for value in common_values:
                 group = main_group_func(s, a_group) | main_group_func(s, b_group)
-                cells = sorted(cell for cell in self.get_candidates_indices_by_value(value, group))
+                cells = sorted(cell for cell in puzzle.get_candidates_indices_by_value(value, group))
                 if len(cells) != 4:
                     continue
 
                 if self.is_rectangle(*cells):
                     target_cells = ((secondary_group_func(s, *cells[0]) |
                                     secondary_group_func(s, *cells[3])) - set(cells))
-                    if self.remove_candidate_from_group(value, target_cells):
+                    if puzzle.remove_candidate_from_group(value, target_cells):
                         progress = True
 
         return progress
